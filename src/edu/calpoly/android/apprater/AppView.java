@@ -6,6 +6,16 @@ import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+/**
+ * This class is a custom class that is used for visualizing the state of an App object
+ * It has three different states:  If the AppView's corresponding App has not been installed
+ * yet, then its background color is red.  If it has been installed, but hasn't been rated,
+ * then the background color is yellow.  If it has been installed and rated, then its background
+ * color is green
+ * Makes use of app_view.xml
+ * @author Storm
+ *
+ */
 public class AppView extends RelativeLayout {
 
 	/** The data behind this View. Contains the app's information. */

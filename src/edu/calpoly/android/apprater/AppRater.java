@@ -22,6 +22,15 @@ import com.actionbarsherlock.view.MenuItem;
 
 import edu.calpoly.android.apprater.AppView.OnAppChangeListener;
 
+/**
+ * Contains definition for the main AppRater Activity class
+ * This class will display the list of applications the user is supposed to test and rate.
+ * It starts the AppDownloadService in order to add new Apps to the underlying database. 
+ * The new apps are retrieved from a website through this Service.
+ * Makes use of app_list.xml
+ * @author Storm
+ *
+ */
 public class AppRater extends SherlockFragmentActivity implements OnAppChangeListener, OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 	
 	/** The ListView that contains the List of AppViews. */

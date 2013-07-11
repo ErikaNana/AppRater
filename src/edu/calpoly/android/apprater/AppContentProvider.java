@@ -54,6 +54,12 @@ public class AppContentProvider extends ContentProvider {
 	/** Matches content URIs requested by accessing applications with possible
 	 * expected content URI formats to take specific actions in this provider. */
 	private static final UriMatcher s_URIMatcher;
+	/** Static initialization block
+	 * Advantages: if loading items into a name space, need to do a computation in order to 
+	 * initialize static variables (this block gets executed exactly once, when the class 
+	 * if first loaded)
+	 * Good for using for security related issues or logging related tasks
+	 *  */
 	static {
 		s_URIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 		s_URIMatcher.addURI(AUTHORITY, BASE_PATH + "/apps", ALL_APPS);
@@ -69,9 +75,10 @@ public class AppContentProvider extends ContentProvider {
 		this.database = new AppDatabaseHelper(getContext(),
 			AppDatabaseHelper.DATABASE_NAME, null,
 			AppDatabaseHelper.DATABASE_VERSION);
-		return false;
+		//return true since the provider was successfully loaded
+		return true;
 	}
-
+	/**Don't really care about this method */
 	@Override
 	public String getType(Uri uri) {
 		return null;
@@ -90,13 +97,15 @@ public class AppContentProvider extends ContentProvider {
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
 		String sortOrder) {
 		
-		//Use a helper class to perform a query for us.
+		/* Use a helper class to perform a query for us.  SQLiteQueryBuilder is a convenience
+		 * class that builds SQL queries to be sent to SQLiteDatabase objects*/
 		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 		
 		//Make sure the projection is proper before querying.
 		checkColumns(projection);
 		
-		//Set up helper to query our app table.
+		/*Set up helper to query our app table.  DATABASE_TABLE_APP is the table we're doing
+		 * the query on */
 		queryBuilder.setTables(AppTable.DATABASE_TABLE_APP);
 		
 		String orderBy = null;
@@ -106,21 +115,27 @@ public class AppContentProvider extends ContentProvider {
 		
 		switch(uriType)	{
 		
+		//want to get all of the apps
 		case ALL_APPS:
 			
-			//Default sort order if none specified
+			/* Default sort order if none specified
+			 * Since can't use String.isEmpty, use TextUtils since it has been available since
+			 * API level 1*/
 			if(sortOrder == null || TextUtils.isEmpty(sortOrder)) {
+				//if there is no specified order, order the apps by name
 				orderBy = AppTable.APP_KEY_NAME;
 			}
-			//Specified sort order
+			//Order the apps by the specified order
 			else {
 				orderBy = sortOrder;
 			}
 			
 			break;
-			
+		//want to get just an app by querying its name
 		case APP_NAME:
-			//Note the escaped '"' needed when adding a String to the whereclause.
+			/* Note the escaped '"' needed when adding a String to the where clause. 
+			 * getLastPathSegment gets the name of the app
+			 * AppTable.APP_KEY_NAME returns "name" */
 			queryBuilder.appendWhere(AppTable.APP_KEY_NAME + "= \"" + uri.getLastPathSegment()
 				+ "\"");
 			break;
@@ -131,17 +146,24 @@ public class AppContentProvider extends ContentProvider {
 		
 		//Perform the database query.
 		SQLiteDatabase db = this.database.getWritableDatabase();
+		/* projection = list of columns to return  
+		 * selection = filter declaring which rows to return
+		 * selectionArgs, used to replace variable holders in selection 
+		 * cursors = results returned by a database query*/
 		Cursor cursor = queryBuilder.query(db, projection, selection, selectionArgs, null, null,
 			orderBy);
 		
-		//Set the cursor to automatically alert listeners for content/view refreshing.
+		/* Set the cursor to automatically alert listeners for content/view refreshing.
+		 * getContext() returns the Context that this provider is running in
+		 * getContentResolver returns a ContentResolver instance for this application's package
+		 * uri =  the uri to watch*/
 		cursor.setNotificationUri(getContext().getContentResolver(), uri);
 		
 		return cursor;
 	}
 
 	/**
-	 * Inserts an app into the apptable. Given a specific URI that contains an
+	 * Inserts an app into the AppTable. Given a specific URI that contains an
 	 * app and the values of that app, writes a new row in the table filled
 	 * with that app's information and gives the app a new ID, then returns a URI
 	 * containing the ID of the inserted app.<br><br>
@@ -170,7 +192,8 @@ public class AppContentProvider extends ContentProvider {
 		//as a numerical value by the URIMatcher.
 		case APP_ID:
 			
-			//Perform the database insert, placing the app at the bottom of the table.
+			/* Perform the database insert, placing the app at the bottom of the table.
+			 * values = content inserting into the database*/
 			id = sqlDB.insert(AppTable.DATABASE_TABLE_APP, null, values);
 			break;
 			
@@ -184,7 +207,7 @@ public class AppContentProvider extends ContentProvider {
 			//Alert any watchers of an underlying data change for content/view refreshing.
 			getContext().getContentResolver().notifyChange(uri, null);
 		}
-		
+		//Uri.parse makes the given string a legit URI
 		return Uri.parse(BASE_PATH + "/" + id);
 	}
 
@@ -258,7 +281,10 @@ public class AppContentProvider extends ContentProvider {
 	    case APP_ID:
 	    	String id = uri.getLastPathSegment();
 	    	
-	    	//Perform the actual update in the table.
+	    	/* Perform the actual update in the table.
+	    	 * if selection is not empty, perform the update 
+	    	 * reminder: selection is a filter of which rows to return 
+	    	 * update() returns the number of rows affected*/
 	    	if(!TextUtils.isEmpty(selection)) {
 		    	rowsUpdated = sqlDB.update(AppTable.DATABASE_TABLE_APP, values,
 		    		AppTable.APP_KEY_ID + "=" + id + " AND " + selection, null);
@@ -286,18 +312,20 @@ public class AppContentProvider extends ContentProvider {
 	/**
 	 * Verifies the correct set of columns to return data from when performing a query.
 	 * 
-	 * @param projection
-	 * 						The set of columns about to be queried.
+	 * @param projection The set of columns about to be queried. (or the list of columns to return)
 	 */
 	private void checkColumns(String[] projection)
 	{
 		String[] available = { AppTable.APP_KEY_ID, AppTable.APP_KEY_NAME, AppTable.APP_KEY_RATING,
 				AppTable.APP_KEY_INSTALLURI, AppTable.APP_KEY_INSTALLED };
 		
+		/** Different from HashMap in that Map you store key-value pairs, in Set you store
+		 * only the keys */
 		if(projection != null) {
 			HashSet<String> requestedColumns = new HashSet<String>(Arrays.asList(projection));
 			HashSet<String> availableColumns = new HashSet<String>(Arrays.asList(available));
 			
+			//just makes sure that the request columns are all part of the columns in the table constructed
 			if(!availableColumns.containsAll(requestedColumns))	{
 				throw new IllegalArgumentException("Unknown columns in projection");
 			}

@@ -2,6 +2,11 @@ package edu.calpoly.android.apprater;
 
 /**
  * A POJO (Plain Old Java Object) that represents an App in data form.
+ * Applications that users are supposed to try out and rate are represented by this app
+ * model class.
+ * This class encapsulates the name of the application, a rating for it, the Market-URI from
+ * which the app can be downloaded (link to installing it from the Market), a boolean used
+ * to flag the application as installed, and a unique float ID
  */
 public class App {
 

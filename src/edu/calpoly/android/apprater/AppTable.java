@@ -39,7 +39,12 @@ public class AppTable {
 	public static final int APP_COL_INSTALLED = APP_COL_ID + 4;
 	
 	/** SQLite database creation statement. Auto-increments IDs of inserted Apps.
-	 * App IDs are set after insertion into the database. */
+	 * App IDs are set after insertion into the database.
+	 * The unique and primary key constrains both provide a guarantee for uniqueness
+	 * for a column or set of columns
+	 * A primary key constraint automatically has a unique constraint defined in it 
+	 * Autoincrement: allows a unique number to be generated when a new record is inserted
+	 * into a table*/
 	public static final String DATABASE_CREATE = "create table " + DATABASE_TABLE_APP + " (" + 
 			APP_KEY_ID + " integer primary key autoincrement, " + 
 			APP_KEY_NAME + " text not null unique, " + 

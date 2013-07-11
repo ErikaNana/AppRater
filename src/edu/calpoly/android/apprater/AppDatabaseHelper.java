@@ -6,7 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Class that hooks up to the AppContentProvider for initialization and
- * maintenance. Uses AppTable for assistance.
+ * maintenance of the database (since extends SQLiteOpenHelper).
+ *  Uses AppTable for assistance.
  */
 public class AppDatabaseHelper extends SQLiteOpenHelper {
 
