@@ -81,3 +81,8 @@ preserving interactivity
 		-which means stuck having to create a series of icons for each density or be
 		forced to limit the size of the stylized RatingBar to the size of the custom icons
 		-even then, may see a stretched 'bleed' effect on custom rating bar styles
+		
+Focus problem for the ListView's OnItemClickListener
+-----------------------------------------------------
+-don't need to set each focusable component inside the root ViewGroup to non-focusable
+-just set the root ViewGroup's descendantFocusability property
