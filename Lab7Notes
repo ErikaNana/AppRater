@@ -1,0 +1,83 @@
+AppRater Activity gets the Apps
+-------------------------------
+The activity gets the apps it will display from the AppContentProvider class as a Cursor
+of Apps
+-This is similar to how the JokeList Activity in Lab 4 got a Cursor of Jokes from the JokeContentProvider
+-The AppRater Activity's ListView then uses the AppCursorAdapter class to bind AppViews to the cursor of Apps
+
+AppDownloadService
+-------------------
+The AppRater Activity starts this service in order to add new Apps to the underlying database
+-The new Apps are retrieved from a website through this Service
+-Using a Service is like launching a new Activity except that there is no User Interface
+for the Service
+-The AppDownloadService then downloads and inserts new Apps into the database if they do not
+already exist, and occasionally checks for new Apps to add as long as it is running
+-In order to insert new Apps into the database the AppDownloadService must use the 
+AppContentProvider's insert() method via accessing a Content Resolver
+	-This is similar to the download functionality covered in Lab 5
+-Once the AppDownloadService has successfully added a new App, it broadcasts a special Intent
+with a certain action associated with it
+-The AppRater Activity will use its internal DownloadCompleteReceiver class to listen for and
+match that special Intent
+-When it sees the Intent ti knows that it has to update the list of apps in AppRater with a 
+new Cursor
+-Once an App is downloaded into the list, it may then be installed by clicking on it to launch
+the Play Store that shows the information about the App as it appears in the store
+-The user can then test the app freely outside of the AppRater app
+-The Apps that are installed are marked as such in the ListView via a non-interactive CheckBox
+as well as the background color mentioned above
+-A user can give each App a rating
+	-the user can apply a rating to an app via a RatingBar
+-The AppRater Activity then saves the changes to the App through the AppContentProvider using a custom
+OnAppChangeListener 
+
+cursor.setNotificationUri(getContext().getContentResolver(), uri);
+-------------------------------------------------------------------
+when this is called, the CursorLoader gets the cursor back and registers an observer
+
+getContext().getContentResolver().notifyChange(uri, null);
+-----------------------------------------------------------
+-so when someone modifies data this method is called, and ContentProvider notifies 
+ContentResolver about the changes
+	-in turn, ContentResolver in turn notifies all registered observers
+	-so the observer, which is registered by CursorLoader, forces the CursorLoader (cursor)
+	to load new data
+	
+AppView
+-------
+This is the View representation of an App in the list of Apps, and contains data from an internally
+stored App object
+-Three main components
+	-A TextView containing the name of the app
+	-A non-interactive CheckBox (the user cannot change its checked state)
+	-A RatingBar that lets the user dynamically change their rating of the app
+	
+RatingBar
+---------
+-acts as a subclass of a progress bar
+	-the user can touch a star to give the RatingBar a rating or slide their finger along
+	the RatingBar until they release it, and then the rating is set
+-Can change the size of the default RatingBar in two ways
+	-modify the step size
+		-example enable half-star ratings (set the step size as 0.5)
+	-the number of stars and set the current rating at any time
+-have the option of styling the RatingBar to add custom rating "star" images, sizes and 
+progressive drawing
+	-means Android has a built-in mechanism to automatically fill in an image in the bar based on step size,
+	so you only need to provide a full and empty "star" image
+-it has its own Listener for detecting a rating change
+
+Restrictions of RatingBar
+------------------------
+-if change size of RatingBar to small, you lose the ability to interact with the RatingBar entirely
+-if want an interactive RatingBar, Google discourages placing any components to its left or right
+-if you want to change the number of stars in the RatingBar, you must declare its layout_width
+to be wrap_content
+	-anything else will produce unpredictable rendering results
+-you can choose to style your own RatingBar to change its size and other properties while still
+preserving interactivity
+	-but then must worry about supporting multiple screen densities and sizes
+		-which means stuck having to create a series of icons for each density or be
+		forced to limit the size of the stylized RatingBar to the size of the custom icons
+		-even then, may see a stretched 'bleed' effect on custom rating bar styles
