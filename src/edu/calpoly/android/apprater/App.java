@@ -74,4 +74,10 @@ public class App {
 	public String getInstallURI() {
 		return m_strInstallURI;
 	}
+	
+	public String getPackageFromURI() {
+		//break it down into a marker per line
+		String[] uriParts = m_strInstallURI.split("=");
+		return uriParts[1];
+	}
 }

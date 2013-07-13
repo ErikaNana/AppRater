@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 /**
  * Class that provides content from a SQLite database to the application.
@@ -96,7 +97,7 @@ public class AppContentProvider extends ContentProvider {
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
 		String sortOrder) {
-		
+		Log.w("AppContentProvider", "query uri:  " + uri.toString());
 		/* Use a helper class to perform a query for us.  SQLiteQueryBuilder is a convenience
 		 * class that builds SQL queries to be sent to SQLiteDatabase objects*/
 		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
@@ -114,10 +115,9 @@ public class AppContentProvider extends ContentProvider {
 		int uriType = s_URIMatcher.match(uri);
 		
 		switch(uriType)	{
-		
 		//want to get all of the apps
 		case ALL_APPS:
-			
+			Log.w("AppContentProvider", "query all apps");	
 			/* Default sort order if none specified
 			 * Since can't use String.isEmpty, use TextUtils since it has been available since
 			 * API level 1*/
@@ -133,6 +133,7 @@ public class AppContentProvider extends ContentProvider {
 			break;
 		//want to get just an app by querying its name
 		case APP_NAME:
+			Log.w("AppContentProvider", "query app name");
 			/* Note the escaped '"' needed when adding a String to the where clause. 
 			 * getLastPathSegment gets the name of the app
 			 * AppTable.APP_KEY_NAME returns "name" */
@@ -174,7 +175,7 @@ public class AppContentProvider extends ContentProvider {
 	 */
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
-		
+		Log.w("AppContentProvider", "insert uri:  " + uri.toString());
 		//Open the database for writing.
 		SQLiteDatabase sqlDB = this.database.getWritableDatabase();
 		
@@ -191,7 +192,7 @@ public class AppContentProvider extends ContentProvider {
 		//IMPORTANT: App ID cannot be set to -1 in passed-in URI; -1 is not interpreted
 		//as a numerical value by the URIMatcher.
 		case APP_ID:
-			
+			Log.w("AppContentProvider", "insert uri by id successfull");
 			/* Perform the database insert, placing the app at the bottom of the table.
 			 * values = content inserting into the database*/
 			id = sqlDB.insert(AppTable.DATABASE_TABLE_APP, null, values);

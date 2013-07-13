@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   			  android:id="@+id/appLayout"
   			  android:layout_width="fill_parent"
-  			  android:layout_height="wrap_content">
+  			  android:layout_height="wrap_content"
+  			  android:descendantFocusability="beforeDescendants">
   			  
   <!-- TODO: Fill out remaining attributes of CheckBox, TextView and RatingBar -->
   <CheckBox android:id="@+id/installedCheckbox"

@@ -1,10 +1,15 @@
 package edu.calpoly.android.apprater;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.widget.CheckBox;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.RatingBar.OnRatingBarChangeListener;
 
 /**
  * This class is a custom class that is used for visualizing the state of an App object
@@ -16,7 +21,7 @@ import android.widget.TextView;
  * @author Storm
  *
  */
-public class AppView extends RelativeLayout {
+public class AppView extends RelativeLayout implements OnRatingBarChangeListener{
 
 	/** The data behind this View. Contains the app's information. */
 	private App m_app;
@@ -43,7 +48,49 @@ public class AppView extends RelativeLayout {
 	
 	public AppView(Context context, App app) {
 		super(context);
-		//TODO
+		//initialize the context variable
+		this.context = this.getContext();
+		//inflate the app_view.xml layout
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		/* true makes this AppView object the root ViewGroup of the inflated layout */
+		inflater.inflate(R.layout.app_view, this, true);
+		//initialize components
+		this.m_vwContainer =(RelativeLayout) findViewById(R.id.appLayout);
+		this.m_vwInstalledCheckBox = (CheckBox) findViewById(R.id.installedCheckbox);
+		this.m_vwAppRatingBar = (RatingBar) findViewById(R.id.appRatingBar);
+		this.m_vwAppName = (TextView) findViewById(R.id.appName);
+		
+		setApp(app);
+		//so don't register the initialization of a new app as a change
+		this.m_onAppChangeListener = null;
+		/* Check to see if the app in question is installed on the Android device, and change m_app and the CheckBox's checked status
+		 * appropriately based on the app's install status */
+		/*This returns a PackageInfo object containing information about the package */
+		PackageManager pmanager = context.getPackageManager();
+		//check if the package is installed
+		String packageName = app.getPackageFromURI();
+		Log.w("AppRater", packageName);
+		try {
+			pmanager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+			//it's installed so set app name text
+			TextView name = new TextView(context);
+			name.setText(m_app.getName());
+			//change the AppView's background color depending on installation and rating status
+			int rated = this.m_vwAppRatingBar.getNumStars();
+			//not rated
+			if (rated == 0) {		
+				this.m_vwContainer.setBackgroundColor(getResources().getColor(R.color.installed_app));
+			}
+			else {
+				this.m_vwContainer.setBackgroundColor(getResources().getColor(R.color.rated_app));
+			}
+			
+		} catch (NameNotFoundException e) {
+			//app is not installed
+			this.m_vwContainer.getResources().getColor(R.color.new_app);
+			Log.w("AppRater", "Package not found");
+			e.printStackTrace();
+		}
 	}
 	
 	public App getApp() {
@@ -51,7 +98,9 @@ public class AppView extends RelativeLayout {
 	}
 	
 	public void setApp(App app) {
-		//TODO
+		this.m_app = app;
+		//m_app's data changes 
+		this.notifyOnAppChangeListener();
 	}
 	
 	/**
@@ -82,6 +131,7 @@ public class AppView extends RelativeLayout {
 	}
 	
 	/**
+	 * Implementing onRaingBarChangeListener
 	 * Interface definition for a callback to be invoked when the underlying
 	 * App is changed in this AppView object.
 	 */
@@ -96,5 +146,18 @@ public class AppView extends RelativeLayout {
 		 *            The App that was changed.
 		 */
 		public void onAppChanged(AppView view, App app);
+	}
+
+	@Override
+	/**
+	 * @param ratingBar The RatingBar whose rating has changed
+	 * @param rating The current rating.  
+	 * @param fromUser True if the rating change was initiated by a user's touch gesture or arrow key/horizontal trackbell movement
+	 */
+	public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+		//change m_app's rating to the value in the rating parameter
+		m_app.setRating(rating);
+		//m_app's data changes 
+		this.notifyOnAppChangeListener();
 	}
 }

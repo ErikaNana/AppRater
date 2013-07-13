@@ -86,3 +86,65 @@ Focus problem for the ListView's OnItemClickListener
 -----------------------------------------------------
 -don't need to set each focusable component inside the root ViewGroup to non-focusable
 -just set the root ViewGroup's descendantFocusability property
+	-it defines the relationship between the ViewGroup and its descendants when looking for a view to take focus
+	Must be one of the following constant values.
+		Constant	Value	Description
+		beforeDescendants	0	 The ViewGroup will get focus before any of its descendants.
+		afterDescendants	1	 The ViewGroup will get focus only if none of its descendants want it.
+		blocksDescendants	2	 The ViewGroup will block its descendants from receiving focus.
+		
+PackageManager Class
+--------------------
+class for retrieving various kinds of information related to the application packages that are currently installed on the device
+
+Services
+---------
+-a Service is like an Activity without a user interface that runs in the background
+-an application can start a Service, let it do its thing in the background, and still provide app functionality without any disruption to its user
+-any time you need to perform long and/or routine tasks in code, consider enlisting Services to help accomplish this
+-Key points to services
+	-Services are not separate processes
+		-when launched, they run in the same process as the application they were started in
+		-this means you should not use them for work-heavy processes like playing MP3s
+	-Services are not threads
+		-they are not a method for working off of the main running thread
+		-however, IntentServices, do have their own thread
+	-Services can be accessed by other applications than the one that started them
+		-this creates a sort of client-server interface, but requires much more code setup than running a service local
+		to just one application
+	-Services are not AsyncTasks
+		-AsyncTasks are designed to run very short operations that do one thing and quickly exit
+		-Services are designed to run for longer events and even when application Activity isn't open
+		-we want to run recurring code on a timer over more than just a few seconds, so we will not be using AsynTask
+		
+IntentService
+-------------
+-is a Service started using an intent
+-it is a base class for Service(s) that handle asynchronous requests (expressed as Intent(s)) on demand
+	-clients sent requests through startService(Intent) calls
+	-the service is started as needed
+	-handles each intent in turn using a working thread, and stops itself when it runs out of work
+-this "work queue processor" pattern is commonly used to offload tasks from an application's main thread
+	-the IntentService class exists to simplify this pattern and take care of mechanics
+	-it will receive the Intents, launch a worker thread, and stop the service as appropriate
+	-all requests are handled on a single worker thread - they may take as long as necessary (and will not block the application's main loop) but
+	only one request will be processed at a time
+	
+Anonymous Inner Class
+----------------------
+-an anonymous inner class can come useful when making an instance of an object with certain "extras" such as overloading methods, without
+having to actually subclass a class
+
+button.addActionListener(new ActionListener() {
+    public void actionPerformed(ActionEvent e)
+    {
+        // do something.
+    }
+});
+
+Using this method makes coding a little bit quicker, as I don't need to make an extra class that implements ActionListener -- 
+I can just instantiate an anonymous inner class without actually making a separate class.
+
+App Market Information URI
+--------------------------
+-this is the URI corresponding to the app's information/installation page if you search for and touch the app in the Google Play Store
