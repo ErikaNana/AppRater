@@ -6,7 +6,7 @@
     
     <uses-sdk android:minSdkVersion="10"
         	  android:targetSdkVersion="17" />
-    
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application android:allowBackup="true"
         		 android:icon="@drawable/ic_launcher"
         		 android:theme="@style/Theme.Sherlock.Light">
@@ -21,7 +21,7 @@
         <provider android:name="edu.calpoly.android.apprater.AppContentProvider"
 		          android:authorities="edu.calpoly.android.apprater.contentprovider"
 		          android:exported="false"/>
-		          
+		<service android:enabled="true" android:name="edu.calpoly.android.apprater.AppDownloadService"/>          
     </application>
 
 </manifest> 

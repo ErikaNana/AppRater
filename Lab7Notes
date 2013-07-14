@@ -148,3 +148,21 @@ I can just instantiate an anonymous inner class without actually making a separa
 App Market Information URI
 --------------------------
 -this is the URI corresponding to the app's information/installation page if you search for and touch the app in the Google Play Store
+
+intent.addCategory(Intent.CATEGORY_DEFAULT)
+-------------------------------------------
+-Categories provide additional detail about the action the intent performs. When 
+resolving an intent, only activities that provide all of the requested categories will be used.
+-Set (Intent.CATEGORY_DEFAULT) if the activity should be an option for the default 
+action (center press) to perform on a piece of data. Setting this will hide from 
+the user any activities without it set when performing an action on some data. Note that this is normal 
+-not- set in the Intent when initiating an action -- it is for use in intent filters specified 
+in packages
+
+Including IntentService: have to change Manifest file
+----------------------------------------------------
+-need to include tags for service
+-since downloading data from a file hosted online, need to include a permission for accessing 
+the internet
+
+	

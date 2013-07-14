@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -85,13 +86,34 @@ public class AppRater extends SherlockFragmentActivity implements OnAppChangeLis
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
     	MenuInflater inflater = this.getSupportMenuInflater();
+    	/* options from this menu will allow users of the app to start/stop the service that 
+    	 * downloads the apps from the server to the list and rechecks the server periodically
+    	 * for more, or remove all apps from the list*/
 		inflater.inflate(R.menu.mainmenu, menu);
 		return true;
     }
     
     @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-    	//TODO
+    	int button = item.getItemId();
+    	switch (button) {
+	    	case(R.id.menu_startDownload):{
+	    		/* getIntent() = get the intent that started this service */
+	    		Log.w("AppRater", "starting download");
+	    		this.startService(getIntent());
+	    	}
+	    	case (R.id.menu_stopDownload):{
+	    		Log.w("AppRater", "stopping download");
+	    		this.stopService(getIntent());
+	    	}
+	    	case (R.id.menu_removeAll):{
+	    		Log.w("AppRater", "removing all apps from the list");
+	    		Uri removeUri = Uri.withAppendedPath(AppContentProvider.CONTENT_URI, "/apps");
+	    		Log.w("AppRater", "remove uri:  " + removeUri);
+	    		//use the ContentResolver to delete
+	    		this.getContentResolver().delete(removeUri, null, null);
+	    	}
+    	}
     	return super.onOptionsItemSelected(item);
     }
 
@@ -147,7 +169,11 @@ public class AppRater extends SherlockFragmentActivity implements OnAppChangeLis
 	 */
 	public void fillData() {
 		this.getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
-		//TODO
+		/*instead of reassigning the adapter to the ListView after restarting the CursorLoader
+		 * like in Lab 4, just call adapter's notifyDataSetChanged() method.  This prevents the
+		 * ListView from always scrolling back up to the top of the list on every change, but 
+		 * preserves its refresh */
+		this.m_appAdapter.notifyDataSetChanged();
 	}
 	
 	/**

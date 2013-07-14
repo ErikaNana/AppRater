@@ -140,8 +140,19 @@ public class AppDownloadService extends android.app.IntentService {
 	/**
 	 * This method broadcasts an intent with a specific Action String. This method should be
 	 * called when a new App has been downloaded and added successfully.
+	 * This is where Intent broadcasting happens
 	 */
 	private void announceNewApp() {
+		/* create an intent with ACTION_NEW_APP_TO_REVIEW as the action
+		 * this string can be found in the DownloadCompleteReceiver subclass inside the 
+		 * AppRater class */
+		Intent announce = new Intent(AppRater.DownloadCompleteReceiver.ACTION_NEW_APP_TO_REVIEW);
+		/*set the category. This is necessary for matching the soon-to-be broadcast Intent with the
+		 * broadcast receiver*/
+		announce.addCategory(Intent.CATEGORY_DEFAULT);
+		/* If you know there will only be local broadcasts of INtents within your app's 
+		 * process, there is an optional LocalBroadcastManager you can use */
+		this.sendBroadcast(announce);
 		
 	}
 	/* This method is invoked on the worker thread with a request to process. Only one Intent is processed at a time, 
