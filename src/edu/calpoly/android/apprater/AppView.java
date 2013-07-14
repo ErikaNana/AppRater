@@ -63,18 +63,26 @@ public class AppView extends RelativeLayout implements OnRatingBarChangeListener
 		setApp(app);
 		//so don't register the initialization of a new app as a change
 		this.m_onAppChangeListener = null;
+
+	}
+	
+	public App getApp() {
+		return m_app;
+	}
+	
+	public void setApp(App app) {
+		this.m_app = app;
 		/* Check to see if the app in question is installed on the Android device, and change m_app and the CheckBox's checked status
 		 * appropriately based on the app's install status */
 		/*This returns a PackageInfo object containing information about the package */
 		PackageManager pmanager = context.getPackageManager();
 		//check if the package is installed
-		String packageName = app.getPackageFromURI();
-		Log.w("AppRater", packageName);
+		String packageName = m_app.getPackageFromURI();
+		Log.e("AppView", "package name:  " + packageName);
+		//set the name of the app
+		this.m_vwAppName.setText(m_app.getName());
 		try {
 			pmanager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
-			//it's installed so set app name text
-			TextView name = new TextView(context);
-			name.setText(m_app.getName());
 			//change the AppView's background color depending on installation and rating status
 			int rated = this.m_vwAppRatingBar.getNumStars();
 			//not rated
@@ -84,21 +92,17 @@ public class AppView extends RelativeLayout implements OnRatingBarChangeListener
 			else {
 				this.m_vwContainer.setBackgroundColor(getResources().getColor(R.color.rated_app));
 			}
+			//it's installed so check the box
+			this.m_vwInstalledCheckBox.setChecked(true);
 			
 		} catch (NameNotFoundException e) {
 			//app is not installed
-			this.m_vwContainer.getResources().getColor(R.color.new_app);
-			Log.w("AppRater", "Package not found");
+			this.m_vwInstalledCheckBox.setChecked(false);
+			int color = this.m_vwContainer.getResources().getColor(R.color.new_app);
+			this.m_vwContainer.setBackgroundColor(color);
+			Log.w("AppView", "Package not found");
 			e.printStackTrace();
 		}
-	}
-	
-	public App getApp() {
-		return m_app;
-	}
-	
-	public void setApp(App app) {
-		this.m_app = app;
 		//m_app's data changes 
 		this.notifyOnAppChangeListener();
 	}

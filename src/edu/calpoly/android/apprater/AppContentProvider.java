@@ -137,6 +137,7 @@ public class AppContentProvider extends ContentProvider {
 			/* Note the escaped '"' needed when adding a String to the where clause. 
 			 * getLastPathSegment gets the name of the app
 			 * AppTable.APP_KEY_NAME returns "name" */
+			Log.w("AppContent", "Column name?:  " + AppTable.APP_KEY_NAME);
 			queryBuilder.appendWhere(AppTable.APP_KEY_NAME + "= \"" + uri.getLastPathSegment()
 				+ "\"");
 			break;
@@ -151,9 +152,13 @@ public class AppContentProvider extends ContentProvider {
 		 * selection = filter declaring which rows to return
 		 * selectionArgs, used to replace variable holders in selection 
 		 * cursors = results returned by a database query*/
+
+		
 		Cursor cursor = queryBuilder.query(db, projection, selection, selectionArgs, null, null,
 			orderBy);
 		
+		Log.w("AppContent", "doing the query");
+
 		/* Set the cursor to automatically alert listeners for content/view refreshing.
 		 * getContext() returns the Context that this provider is running in
 		 * getContentResolver returns a ContentResolver instance for this application's package
@@ -192,10 +197,11 @@ public class AppContentProvider extends ContentProvider {
 		//IMPORTANT: App ID cannot be set to -1 in passed-in URI; -1 is not interpreted
 		//as a numerical value by the URIMatcher.
 		case APP_ID:
-			Log.w("AppContentProvider", "insert uri by id successfull");
+			Log.w("AppContentProvider", "App_ID:  "  + APP_ID);
 			/* Perform the database insert, placing the app at the bottom of the table.
 			 * values = content inserting into the database*/
 			id = sqlDB.insert(AppTable.DATABASE_TABLE_APP, null, values);
+			Log.w("AppContentProvider", "insert uri by id successfull");
 			break;
 			
 		default:
@@ -247,7 +253,7 @@ public class AppContentProvider extends ContentProvider {
 	    
 	    //Only alert if rows were actually removed.
 	    if(rowsDeleted > 0) {
-	    	
+	    	Log.e("AppContentProvider", rowsDeleted + " rows were removed");
 		    //Alert any watchers of an underlying data change for content/view refreshing.
 		    getContext().getContentResolver().notifyChange(uri, null);
 	    }
@@ -317,6 +323,7 @@ public class AppContentProvider extends ContentProvider {
 	 */
 	private void checkColumns(String[] projection)
 	{
+
 		String[] available = { AppTable.APP_KEY_ID, AppTable.APP_KEY_NAME, AppTable.APP_KEY_RATING,
 				AppTable.APP_KEY_INSTALLURI, AppTable.APP_KEY_INSTALLED };
 		
@@ -330,6 +337,7 @@ public class AppContentProvider extends ContentProvider {
 			if(!availableColumns.containsAll(requestedColumns))	{
 				throw new IllegalArgumentException("Unknown columns in projection");
 			}
+			Log.w("AppContent", "checking columns...correct");
 		}
 	}
 }

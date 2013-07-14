@@ -100,21 +100,27 @@ public class AppRater extends SherlockFragmentActivity implements OnAppChangeLis
 	    	case(R.id.menu_startDownload):{
 	    		/* getIntent() = get the intent that started this service */
 	    		Log.w("AppRater", "starting download");
-	    		this.startService(getIntent());
+	    		//since service has a an action, we're using it
+	    		Intent intent = new Intent(this,AppDownloadService.class);
+	    		Log.w("AppRater", intent.toString());
+	    		this.startService(intent);
+	    		return true;
 	    	}
 	    	case (R.id.menu_stopDownload):{
 	    		Log.w("AppRater", "stopping download");
 	    		this.stopService(getIntent());
+	    		return true;
 	    	}
 	    	case (R.id.menu_removeAll):{
 	    		Log.w("AppRater", "removing all apps from the list");
-	    		Uri removeUri = Uri.withAppendedPath(AppContentProvider.CONTENT_URI, "/apps");
+	    		Uri removeUri = Uri.withAppendedPath(AppContentProvider.CONTENT_URI, "apps");
 	    		Log.w("AppRater", "remove uri:  " + removeUri);
 	    		//use the ContentResolver to delete
 	    		this.getContentResolver().delete(removeUri, null, null);
+	    		return true;
 	    	}
     	}
-    	return super.onOptionsItemSelected(item);
+    	return false;
     }
 
 	@Override
