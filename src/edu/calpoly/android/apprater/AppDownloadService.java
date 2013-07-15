@@ -73,29 +73,25 @@ public class AppDownloadService extends IntentService{
 						String uri = split[1];
 						//convert the info to an app add it
 						App app = new App(name,uri);
-						Log.e("ADS", "app name from file:  " + name);
 						addNewApp(app);
 					}
 				}
 			} 
 			catch (IOException e) {
-				Log.e("AppRater", e.getMessage());
+				Log.w("AppRater", e.getMessage());
 			} 
 
 		} catch (MalformedURLException e) {
-			Log.e("AppRater", e.getMessage());
+			Log.w("AppRater", e.getMessage());
 		}
 	}
 
 	/**
 	 * This method adds a new App to the AppContentProvider.
 	 * 
-	 * @param app
-	 *            The new App object to add to the ContentProvider.
+	 * @param app The new App object to add to the ContentProvider.
 	 */
 	private void addNewApp(App app) {
-		Log.e("ADS", "adding a new app");
-		Log.e("ADS", "app name:  " + app.getName());
 		/* get the ContentResolver for AppRater
 		 * the contentResolver obtained here allows access to the operations in the
 		 * AppContentProvider.  For example, calling query() from the ContentResolver object
@@ -107,15 +103,12 @@ public class AppDownloadService extends IntentService{
 		String [] projection = {AppTable.APP_KEY_NAME, AppTable.APP_KEY_INSTALLED};
 		Uri uri;
 		uri = Uri.withAppendedPath(AppContentProvider.CONTENT_URI, "apps/" + app.getName());
-		Log.e("AppDownload", "uri created for single app:  " + uri.toString());
 		/* projection is columns want to return
 		 * selection is filter of which rows to return, formatted as where clause (without where) 
 		 * WHERE <column name><operator value>*/
 		Cursor cursor = contentResolver.query(uri, projection, null, null, null);
-		Log.e("AppContent", "after the query");
 		//if cursor contains 0 rows, app doesn't exist, so add it
 		if (cursor.getCount() == 0) {
-			Log.e("AppDownload", "cursor is 0");
 			ContentValues contentValues = new ContentValues();
 			//put the app's data into contentValues (column name for the table, data)
 			contentValues.put(AppTable.APP_KEY_NAME, app.getName());
@@ -123,11 +116,9 @@ public class AppDownloadService extends IntentService{
 			contentValues.put(AppTable.APP_KEY_INSTALLURI, app.getInstallURI());
 			//can't put booleans in SQLite, so use 1 for true and 0 for false
 			if (app.isInstalled()) {
-				Log.e("AppDownloadService", "app is downloaded");
 				contentValues.put(AppTable.APP_KEY_INSTALLED, 1);
 			}
 			else {
-				Log.e("AppDownloadService", "app is not downloaded");
 				contentValues.put(AppTable.APP_KEY_INSTALLED, 0);
 			}
 			//parse a new Uri for insertion into the database
@@ -136,7 +127,6 @@ public class AppDownloadService extends IntentService{
 			Long automated_id = Long.valueOf(newUri.getLastPathSegment());
 			//set the app id to this id
 			app.setID(automated_id);
-			Log.e("AppDownloadService", "new id:  " + app.getID());
 			
 			//tell application that there is a new App to rate
 			announceNewApp();
@@ -173,7 +163,6 @@ public class AppDownloadService extends IntentService{
 	 */
 	@Override
 	protected void onHandleIntent(Intent arg0) {
-		Log.e("ADS", "onHandleIntent");
 		/*Schedule a task for repeated fixed-rate execution after a specific delay has passed.
 		 * Parameters
 		 * task  the task to schedule. 

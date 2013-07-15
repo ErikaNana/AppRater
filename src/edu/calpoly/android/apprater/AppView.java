@@ -3,14 +3,12 @@ package edu.calpoly.android.apprater;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.CheckBox;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * This class is a custom class that is used for visualizing the state of an App object
@@ -53,7 +51,7 @@ public class AppView extends RelativeLayout{
 		this.context = this.getContext();
 		//inflate the app_view.xml layout
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		/* true makes this AppView object the root ViewGroup of the inflated layout */
+		//true makes this AppView object the root ViewGroup of the inflated layout
 		inflater.inflate(R.layout.app_view, this, true);
 		//initialize components
 		this.m_vwContainer =(RelativeLayout) findViewById(R.id.appLayout);
@@ -76,7 +74,6 @@ public class AppView extends RelativeLayout{
 				//change m_app's rating to the value in the rating parameter
 					m_app.setRating(rating);
 					//m_app's data changes 
-					Toast.makeText(getContext(), "rating changed", Toast.LENGTH_SHORT).show();
 					notifyOnAppChangeListener();					
 			}
 		});
@@ -85,16 +82,18 @@ public class AppView extends RelativeLayout{
 	public App getApp() {
 		return m_app;
 	}
-	
+	/**
+	 * Check to see if the app in question is installed on the Android device, 
+	 * and change m_app and the CheckBox's checked status
+	 * appropriately based on the app's install status 
+	 * */
 	public void setApp(App app) {
 		this.m_app = app;
-		/* Check to see if the app in question is installed on the Android device, and change m_app and the CheckBox's checked status
-		 * appropriately based on the app's install status */
-		/*This returns a PackageInfo object containing information about the package */
+		//This returns a PackageInfo object containing information about the package 
 		PackageManager pmanager = context.getPackageManager();
 		//check if the package is installed
 		String packageName = m_app.getPackageFromURI();
-		//Log.e("AppView", "package name:  " + packageName);
+
 		//set the name of the app
 		this.m_vwAppName.setText(m_app.getName());
 		try {
@@ -113,19 +112,17 @@ public class AppView extends RelativeLayout{
 				//rated
 				this.m_vwContainer.setBackgroundColor(getResources().getColor(R.color.rated_app));				
 			}		
-			Toast.makeText(getContext(), "rating from setApp:  " + rated, Toast.LENGTH_SHORT).show();
-
 	
 		} catch (NameNotFoundException e) {
-			//app is not installed
-			this.m_vwAppRatingBar.setIsIndicator(true);
-			//just a precaution
-			this.m_vwAppRatingBar.setRating(0);  
+			//app is not installed 
 			this.m_vwInstalledCheckBox.setChecked(false);
 			int color = this.m_vwContainer.getResources().getColor(R.color.new_app);
 			this.m_vwContainer.setBackgroundColor(color);
-			Log.e("AppView", "Package not found");
 			m_app.setInstalled(false);
+			//disallow rating
+			this.m_vwAppRatingBar.setIsIndicator(true);
+			//just a precaution
+			this.m_vwAppRatingBar.setRating(0); 
 			e.printStackTrace();
 		}
 		//m_app's data changes 

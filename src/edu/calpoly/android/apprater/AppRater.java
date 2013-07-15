@@ -17,7 +17,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -96,7 +95,7 @@ public class AppRater extends SherlockFragmentActivity implements OnAppChangeLis
     }
     /**
      * This is called when the activity is going into the background, but has not (yet) been
-     * killed.  It is the counterpart ot onResume
+     * killed.  It is the counterpart to onResume()
      */
     @Override
     public void onPause() {
@@ -108,9 +107,7 @@ public class AppRater extends SherlockFragmentActivity implements OnAppChangeLis
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		App app = ((AppView) view).getApp();
-		String name = app.getName();
-		Toast.makeText(getBaseContext(), name, Toast.LENGTH_SHORT).show();
-		Toast.makeText(getBaseContext(), "installed status:  "+ app.isInstalled(), Toast.LENGTH_SHORT).show();
+
 		/* create an intent that opens a Google Play URL
 		 * ACTION_VIEW: Display the data to the user. 
 		 * This is the most common action performed on data -- it is the generic action you 
@@ -120,9 +117,7 @@ public class AppRater extends SherlockFragmentActivity implements OnAppChangeLis
 		 * the information supplied by the URI; when used with a tel: URI it will invoke 
 		 * the dialer. 
 		 */
-		Toast.makeText(getBaseContext(), "Check rating on item click:  " + app.getRating(), Toast.LENGTH_SHORT).show();
 		if (!app.isInstalled()) {
-			Toast.makeText(getBaseContext(), "App is not installed", Toast.LENGTH_SHORT).show();
 			Intent intent = new Intent(Intent.ACTION_VIEW);
 			//get the install uri of the app represented by the view
 			String uri = app.getInstallURI();
@@ -144,7 +139,6 @@ public class AppRater extends SherlockFragmentActivity implements OnAppChangeLis
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		//make sure market install launches the request
     	if (requestCode == AppRater.MARKET_REQUEST_CODE) {
-    		Toast.makeText(getBaseContext(), "Handling market request", Toast.LENGTH_SHORT).show();
     		//refresh the view (makes new AppViews)
     		fillData();
     	}
@@ -165,22 +159,17 @@ public class AppRater extends SherlockFragmentActivity implements OnAppChangeLis
     	switch (button) {
 	    	case(R.id.menu_startDownload):{
 	    		/* getIntent() = get the intent that started this service */
-	    		Log.w("AppRater", "starting download");
 	    		//since service has a an action, we're using it
 	    		Intent intent = new Intent(this,AppDownloadService.class);
-	    		Log.w("AppRater", intent.toString());
 	    		this.startService(intent);
 	    		return true;
 	    	}
 	    	case (R.id.menu_stopDownload):{
-	    		Log.w("AppRater", "stopping download");
 	    		this.stopService(getIntent());
 	    		return true;
 	    	}
 	    	case (R.id.menu_removeAll):{
-	    		Log.w("AppRater", "removing all apps from the list");
 	    		Uri removeUri = Uri.withAppendedPath(AppContentProvider.CONTENT_URI, "apps");
-	    		Log.w("AppRater", "remove uri:  " + removeUri);
 	    		//use the ContentResolver to delete
 	    		this.getContentResolver().delete(removeUri, null, null);
 	    		return true;
@@ -303,7 +292,7 @@ public class AppRater extends SherlockFragmentActivity implements OnAppChangeLis
 			notificationBuilder.setAutoCancel(true);
 			//get a reference to NotificationManger
 			NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-			/* don't know what to put for the id
+			/* arbitrary number for the id
 			 * build() combines all of the options that have been set and returns a new Notification
 			 * object */
 			nManager.notify(1, notificationBuilder.build());
