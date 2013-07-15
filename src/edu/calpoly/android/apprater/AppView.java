@@ -7,9 +7,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.CheckBox;
 import android.widget.RatingBar;
+import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.RatingBar.OnRatingBarChangeListener;
+import android.widget.Toast;
 
 /**
  * This class is a custom class that is used for visualizing the state of an App object
@@ -21,7 +22,7 @@ import android.widget.RatingBar.OnRatingBarChangeListener;
  * @author Storm
  *
  */
-public class AppView extends RelativeLayout implements OnRatingBarChangeListener{
+public class AppView extends RelativeLayout{
 
 	/** The data behind this View. Contains the app's information. */
 	private App m_app;
@@ -63,7 +64,22 @@ public class AppView extends RelativeLayout implements OnRatingBarChangeListener
 		setApp(app);
 		//so don't register the initialization of a new app as a change
 		this.m_onAppChangeListener = null;
-
+		this.m_vwAppRatingBar.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
+			
+			@Override
+			/**
+			 * @param ratingBar The RatingBar whose rating has changed
+			 * @param rating The current rating.  
+			 * @param fromUser True if the rating change was initiated by a user's touch gesture or arrow key/horizontal trackbell movement
+			 */
+			public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+				//change m_app's rating to the value in the rating parameter
+					m_app.setRating(rating);
+					//m_app's data changes 
+					Toast.makeText(getContext(), "rating changed", Toast.LENGTH_SHORT).show();
+					notifyOnAppChangeListener();					
+			}
+		});
 	}
 	
 	public App getApp() {
@@ -78,29 +94,38 @@ public class AppView extends RelativeLayout implements OnRatingBarChangeListener
 		PackageManager pmanager = context.getPackageManager();
 		//check if the package is installed
 		String packageName = m_app.getPackageFromURI();
-		Log.e("AppView", "package name:  " + packageName);
+		//Log.e("AppView", "package name:  " + packageName);
 		//set the name of the app
 		this.m_vwAppName.setText(m_app.getName());
 		try {
 			pmanager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
-			//change the AppView's background color depending on installation and rating status
-			int rated = this.m_vwAppRatingBar.getNumStars();
-			//not rated
-			if (rated == 0) {		
-				this.m_vwContainer.setBackgroundColor(getResources().getColor(R.color.installed_app));
+			//app is installed
+			this.m_vwInstalledCheckBox.setChecked(true);
+			m_app.setInstalled(true);
+			this.m_vwAppRatingBar.setIsIndicator(false);
+			
+			this.m_vwAppRatingBar.setRating(app.getRating());
+			float rated = this.m_app.getRating();
+			if (rated == 0) {
+				this.m_vwContainer.setBackgroundColor(getResources().getColor(R.color.installed_app));			
 			}
 			else {
-				this.m_vwContainer.setBackgroundColor(getResources().getColor(R.color.rated_app));
-			}
-			//it's installed so check the box
-			this.m_vwInstalledCheckBox.setChecked(true);
-			
+				//rated
+				this.m_vwContainer.setBackgroundColor(getResources().getColor(R.color.rated_app));				
+			}		
+			Toast.makeText(getContext(), "rating from setApp:  " + rated, Toast.LENGTH_SHORT).show();
+
+	
 		} catch (NameNotFoundException e) {
 			//app is not installed
+			this.m_vwAppRatingBar.setIsIndicator(true);
+			//just a precaution
+			this.m_vwAppRatingBar.setRating(0);  
 			this.m_vwInstalledCheckBox.setChecked(false);
 			int color = this.m_vwContainer.getResources().getColor(R.color.new_app);
 			this.m_vwContainer.setBackgroundColor(color);
-			Log.w("AppView", "Package not found");
+			Log.e("AppView", "Package not found");
+			m_app.setInstalled(false);
 			e.printStackTrace();
 		}
 		//m_app's data changes 
@@ -152,16 +177,12 @@ public class AppView extends RelativeLayout implements OnRatingBarChangeListener
 		public void onAppChanged(AppView view, App app);
 	}
 
-	@Override
+
 	/**
-	 * @param ratingBar The RatingBar whose rating has changed
-	 * @param rating The current rating.  
-	 * @param fromUser True if the rating change was initiated by a user's touch gesture or arrow key/horizontal trackbell movement
+	 * Method for sanity check.
 	 */
-	public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-		//change m_app's rating to the value in the rating parameter
-		m_app.setRating(rating);
-		//m_app's data changes 
-		this.notifyOnAppChangeListener();
+	public String getName() {
+		String name = (String) this.m_vwAppName.getText();
+		return name;
 	}
 }

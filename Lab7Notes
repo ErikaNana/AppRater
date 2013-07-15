@@ -165,4 +165,45 @@ Including IntentService: have to change Manifest file
 -since downloading data from a file hosted online, need to include a permission for accessing 
 the internet
 
+BroadcastReceiver
+----------------
+A type of a listener that watches for specific Intents launched via sendBroadcast()
+-AppDownloadService already invokes this call, but we haven't caught it
+-By implementing a BroadcastReceiver
+	-gain complete control over what to do when a specific broadcast is received
+	-handle these Intents from potentially any application as long as register the 
+	BroadcastReceiver properly
 	
+Registering a BroadcastReceiver
+-------------------------------
+You have to register a BroadcastReceiver with the application in order to properly listen for
+Intents
+	-Do this by calling registerReceiver() and unregisterReceiver()
+	
+IntentFilters
+------------
+-Use them to indicate which Activity was the main Activity in the Manifest file
+-when you register a BroadcastReceiver, you must pass it in an IntentFilter so that it knows
+to search for Intents with appropriate categories
+-Earlier we set the broadcast Intent's category to CATEGORY_DEFAULT, so will add this as category
+to an IntentFilter that gets paired up with DownloadCompleteReceiver
+
+Notifications
+--------------
+-Are messages that show up in an Android device's notification area
+-have two display types: Normal and Big
+-for easy notification customization and creation
+	-Notification.Builder class
+-since want backwards compatibility
+	-use NotificationCompat.Builder class that comes with the v4 Support Library
+	-however, Notification backwards-compatibility is not 100% functional across different
+	versions of Android
+-once built, Notifications cannot post themselves
+	-the NotifcationManager has to be made aware of them and post them itself
+	-to do this, Notifications use PendingIntents
+		-unlike regular Intents, PendingIntents grant the right to perform the action or 
+		operation in them to whatever they are given to be executed
+			-in this case, a pendingIntent allows the NotificationManager to post a Notification
+			to the Notification area
+			-the NotificationManager can be considered a foreign application, and it will use your application's
+			permissions instead of its own

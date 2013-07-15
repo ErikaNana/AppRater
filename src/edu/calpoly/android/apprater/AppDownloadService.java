@@ -137,6 +137,8 @@ public class AppDownloadService extends IntentService{
 			//set the app id to this id
 			app.setID(automated_id);
 			Log.e("AppDownloadService", "new id:  " + app.getID());
+			
+			//tell application that there is a new App to rate
 			announceNewApp();
 		}
 		/* close the cursor object.  Since not using CursorLoader in this class, we are 

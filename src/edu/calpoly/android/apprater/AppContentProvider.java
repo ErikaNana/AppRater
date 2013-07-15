@@ -97,7 +97,7 @@ public class AppContentProvider extends ContentProvider {
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
 		String sortOrder) {
-		Log.w("AppContentProvider", "query uri:  " + uri.toString());
+		//Log.e("AppContentProvider", "query uri:  " + uri.toString());
 		/* Use a helper class to perform a query for us.  SQLiteQueryBuilder is a convenience
 		 * class that builds SQL queries to be sent to SQLiteDatabase objects*/
 		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
@@ -117,7 +117,7 @@ public class AppContentProvider extends ContentProvider {
 		switch(uriType)	{
 		//want to get all of the apps
 		case ALL_APPS:
-			Log.w("AppContentProvider", "query all apps");	
+			//Log.e("AppContentProvider", "query all apps");	
 			/* Default sort order if none specified
 			 * Since can't use String.isEmpty, use TextUtils since it has been available since
 			 * API level 1*/
@@ -133,11 +133,11 @@ public class AppContentProvider extends ContentProvider {
 			break;
 		//want to get just an app by querying its name
 		case APP_NAME:
-			Log.w("AppContentProvider", "query app name");
+			//Log.e("AppContentProvider", "query app name");
 			/* Note the escaped '"' needed when adding a String to the where clause. 
 			 * getLastPathSegment gets the name of the app
 			 * AppTable.APP_KEY_NAME returns "name" */
-			Log.w("AppContent", "Column name?:  " + AppTable.APP_KEY_NAME);
+			//Log.e("AppContent", "Column name?:  " + AppTable.APP_KEY_NAME);
 			queryBuilder.appendWhere(AppTable.APP_KEY_NAME + "= \"" + uri.getLastPathSegment()
 				+ "\"");
 			break;
@@ -157,7 +157,7 @@ public class AppContentProvider extends ContentProvider {
 		Cursor cursor = queryBuilder.query(db, projection, selection, selectionArgs, null, null,
 			orderBy);
 		
-		Log.w("AppContent", "doing the query");
+		//Log.e("AppContent", "doing the query");
 
 		/* Set the cursor to automatically alert listeners for content/view refreshing.
 		 * getContext() returns the Context that this provider is running in
@@ -180,7 +180,7 @@ public class AppContentProvider extends ContentProvider {
 	 */
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
-		Log.w("AppContentProvider", "insert uri:  " + uri.toString());
+		//Log.e("AppContentProvider", "insert uri:  " + uri.toString());
 		//Open the database for writing.
 		SQLiteDatabase sqlDB = this.database.getWritableDatabase();
 		
@@ -197,11 +197,11 @@ public class AppContentProvider extends ContentProvider {
 		//IMPORTANT: App ID cannot be set to -1 in passed-in URI; -1 is not interpreted
 		//as a numerical value by the URIMatcher.
 		case APP_ID:
-			Log.w("AppContentProvider", "App_ID:  "  + APP_ID);
+			//Log.e("AppContentProvider", "App_ID:  "  + APP_ID);
 			/* Perform the database insert, placing the app at the bottom of the table.
 			 * values = content inserting into the database*/
 			id = sqlDB.insert(AppTable.DATABASE_TABLE_APP, null, values);
-			Log.w("AppContentProvider", "insert uri by id successfull");
+			//Log.e("AppContentProvider", "insert uri by id successfull");
 			break;
 			
 		default:
@@ -337,7 +337,7 @@ public class AppContentProvider extends ContentProvider {
 			if(!availableColumns.containsAll(requestedColumns))	{
 				throw new IllegalArgumentException("Unknown columns in projection");
 			}
-			Log.w("AppContent", "checking columns...correct");
+			//Log.e("AppContent", "checking columns...correct");
 		}
 	}
 }
