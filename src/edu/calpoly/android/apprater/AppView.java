@@ -17,8 +17,6 @@ import android.widget.TextView;
  * then the background color is yellow.  If it has been installed and rated, then its background
  * color is green
  * Makes use of app_view.xml
- * @author Storm
- *
  */
 public class AppView extends RelativeLayout{
 
@@ -157,7 +155,6 @@ public class AppView extends RelativeLayout{
 	}
 	
 	/**
-	 * Implementing onRaingBarChangeListener
 	 * Interface definition for a callback to be invoked when the underlying
 	 * App is changed in this AppView object.
 	 */
